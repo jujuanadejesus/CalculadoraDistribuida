@@ -1,0 +1,102 @@
+package Servidor1;
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class Servidor_Op_Basica extends Thread  {
+   public static void main(String args[]) {
+		
+		try {
+
+			ServerSocket s = new ServerSocket(12347);
+			System.out.println("Conectado ao Servidor!");
+			while (true) {
+
+				Socket connect = s.accept();
+				System.out.println("Conexão Nova!");
+
+				Thread x = new Servidor_Op_Basica(connect);
+				x.start();
+
+			}
+		}
+		catch (IOException e) {
+
+			System.out.println("IOException: " + e);
+		}
+	}
+
+	private Socket connect;
+
+	public Servidor_Op_Basica(Socket s) {
+            connect = s;
+	}
+
+	public void run() {
+		try {
+
+			BufferedReader input = new BufferedReader(new
+					InputStreamReader(connect.getInputStream()));
+			PrintStream out = new PrintStream(connect.getOutputStream());
+			
+			String line = "x";
+			String op1 = null;
+			String op2 = null;
+			String opcao = null;
+			Double auxiliar = 0.0;
+			
+			while (line != null){
+				line = input.readLine();				
+				if(line == null) break;
+				System.out.println(".> " + line);								
+				if(op1 != null && op2 == null)
+					op2 = line;				
+				if(op1 == null && opcao != null)
+					op1 = line;
+				if(op1 == null && op2 == null) 
+					opcao = line;				
+				
+
+				if(op1 != null && op2 != null && opcao != null){
+
+					
+					if(Integer.parseInt(opcao) == 1){
+						System.out.println("Subtracao ");
+						auxiliar = Double.parseDouble(op1) - Double.parseDouble(op2);
+						System.out.println(":: " +  op1 +" - " + op2 + " = " + Double.toString(auxiliar));
+					}
+					if(Integer.parseInt(opcao) == 2){
+						System.out.println("Soma ");
+						auxiliar = Double.parseDouble(op1) + Double.parseDouble(op2);
+						System.out.println(":: " +  op1 +" + " + op2 + " = " + Double.toString(auxiliar));
+					}
+
+					if(Integer.parseInt(opcao) == 3){
+						System.out.println("Divisao ");
+						auxiliar = Double.parseDouble(op1) / Double.parseDouble(op2);
+						System.out.println(":: " +  op1 +" / " + op2 + " = " + Double.toString(auxiliar));
+					}
+					if(Integer.parseInt(opcao) == 4){
+						System.out.println("Multiplicacao ");
+						auxiliar = Double.parseDouble(op1) * Double.parseDouble(op2);
+						System.out.println(":: " +  op1 +" * " + op2 + " = " + Double.toString(auxiliar));
+					}					
+					out.println(Double.toString(auxiliar));
+					System.out.println("Resultado Enviado!");
+					System.out.println(" ");
+					op1 = null;
+					op2 = null;
+					opcao = null;
+				}
+			}
+
+			connect.close();
+		}
+		catch (IOException e) {
+
+			System.out.println("IOException: " + e);
+		}
+	}
+
+}

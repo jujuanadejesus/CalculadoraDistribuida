@@ -1,0 +1,102 @@
+package Servidor1;
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.math.*;
+
+public class Servidor2 extends Thread  {
+   public static void main(String args[]) {
+		
+		try {
+
+			ServerSocket s = new ServerSocket(12348);
+			System.out.println("Conectado ao Servidor!");
+			while (true) {
+
+
+				Socket conexao = s.accept();
+				System.out.println("Conexão Nova!");
+
+				Thread x = new Servidor2(conexao);
+				x.start();
+
+			}
+		}
+		catch (IOException e) {
+
+			System.out.println("IOException: " + e);
+		}
+	}
+
+	private Socket connect;
+
+	public Servidor2(Socket s) {
+            connect = s;
+	}
+
+	public void run() {
+		try {
+
+			BufferedReader entrada = new BufferedReader(new
+					InputStreamReader(connect.getInputStream()));
+			PrintStream saida = new PrintStream(connect.getOutputStream());
+			
+
+			String line = "x";
+			String op1 = null;
+			String op2 = null;
+			String opcao = null;
+			Double auxiliar2 =0.0;
+			
+			while (line != null && !(line.trim().equals(""))) {				
+				line = entrada.readLine();
+				if(line == null) break;
+				System.out.println(".> " + line);					
+				if(op1 != null && op2 == null)
+					op2 = line;				
+				if(op1 == null && opcao != null)
+					op1 = line;
+				if(op1 == null && op2 == null) 
+					opcao = line;				
+				
+
+				if(op1 != null && op2 != null && opcao != null){
+					System.out.println("Operacao " + opcao + " com numeros: " +  op1 +" e " + op2);
+
+					
+					if(Integer.parseInt(opcao) == 5){
+						System.out.println("Porcentagem ");
+						auxiliar2 = Double.parseDouble(op1) * (Double.parseDouble(op2)/100);
+						System.out.println("=> " +  op2 +"% de " + op1 + " = " + Double.toString(auxiliar2));						
+					}
+					if(Integer.parseInt(opcao) == 6){
+						System.out.println("Potencia ");
+						auxiliar2 = Math.pow(Double.parseDouble(op1), Double.parseDouble(op2));
+						System.out.println("=> " +  op1 +" ^ " + op2 + " = " + Double.toString(auxiliar2));						
+					}					
+					
+					if(Integer.parseInt(opcao) == 7){
+						System.out.println("Raiz Quadrada ");
+						auxiliar2 = Math.sqrt(Double.parseDouble(op1));
+						System.out.println("=> Raiz Quadrada de " +  op1 + " = " + Double.toString(auxiliar2));						
+					}
+					
+					saida.println(Double.toString(auxiliar2));
+					System.out.println("Resultado Enviado!");
+					System.out.println(" ");
+					op1 = null;
+					op2 = null;
+					opcao = null;
+				}
+			}
+
+			connect.close();
+		}
+		catch (IOException e) {
+
+			System.out.println("IOException: " + e);
+		}
+	}
+
+}
